@@ -130,18 +130,3 @@ Resource, ResourceType, Conversation, Message, ActivityLog.
   `User → ActivityLog`, `ResourceType → Resource`
 - Many-to-Many: `Task ↔ Category`, `Note ↔ Category`, `Resource ↔ Category`
 
-## Screenshots
-
-_Add screenshots of the running app here before submission (Dashboard, Tasks,
-Notes, Resources, AI Chat, Dark mode)._
-
-## Deliverables checklist (per spec)
-
-- [x] Complete source code
-- [ ] PostgreSQL database backup (`pg_dump ai_study_hub > backup.sql` once you have real data)
-- [x] requirements.txt
-- [x] README.md
-- [ ] Screenshots
-- [ ] Git & GitHub (push this folder to a new repo)
-- [x] ERD (see above)
-- [ ] LinkedIn video post (optional)
