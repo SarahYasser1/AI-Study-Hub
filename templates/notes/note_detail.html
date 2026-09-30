@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }}{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;">
+  <h2>{{ note.title }}</h2>
+  <div>
+    <a href="{% url 'notes:note_update' note.pk %}" class="btn btn-sm">Edit</a>
+    <a href="{% url 'notes:note_delete' note.pk %}" class="btn btn-sm btn-danger">Delete</a>
+  </div>
+</div>
+
+<div class="card" style="white-space:pre-wrap;">{{ note.content }}</div>
+
+<div class="card" style="margin-top:1rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <h3>✨ AI Summary</h3>
+    <button id="summarize-btn" class="btn btn-sm btn-primary" data-url="{% url 'notes:note_summarize' note.pk %}">Generate summary</button>
+  </div>
+  <p id="summary-text">{{ note.ai_summary|default:"No summary yet — click the button above." }}</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('summarize-btn').addEventListener('click', function () {
+  const btn = this;
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  fetch(btn.dataset.url, {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCookie('csrftoken') },
+  })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('summary-text').textContent = data.summary;
+      btn.disabled = false;
+      btn.textContent = 'Regenerate summary';
+    });
+});
+</script>
+{% endblock %}

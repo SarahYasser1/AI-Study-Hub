@@ -1,0 +1,7 @@
+[
+  {"model": "resources.resourcetype", "pk": 1, "fields": {"name": "Video", "icon": "🎥"}},
+  {"model": "resources.resourcetype", "pk": 2, "fields": {"name": "Article", "icon": "📄"}},
+  {"model": "resources.resourcetype", "pk": 3, "fields": {"name": "Book", "icon": "📚"}},
+  {"model": "resources.resourcetype", "pk": 4, "fields": {"name": "Course", "icon": "🎓"}},
+  {"model": "resources.resourcetype", "pk": 5, "fields": {"name": "Tool", "icon": "🛠️"}}
+]

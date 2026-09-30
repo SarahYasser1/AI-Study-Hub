@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Resources{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;">
+  <h2>My Resources</h2>
+  <a href="{% url 'resources:resource_create' %}" class="btn btn-primary">+ New Resource</a>
+</div>
+
+<form method="get" class="filters">
+  <input type="text" name="q" value="{{ query }}" placeholder="Search resources..." class="search-input" style="max-width:220px;">
+  <select name="type" onchange="this.form.submit()">
+    <option value="">All types</option>
+    {% for t in resource_types %}
+    <option value="{{ t.id }}" {% if selected_type == t.id|stringformat:'s' %}selected{% endif %}>{{ t.name }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-sm">Filter</button>
+</form>
+
+<div class="grid grid-2">
+  {% for r in page_obj %}
+  <div class="card">
+    <h3><a href="{{ r.get_absolute_url }}">{{ r.title }}</a></h3>
+    {% if r.resource_type %}<span class="badge badge-medium">{{ r.resource_type.name }}</span>{% endif %}
+    <p>{{ r.description|truncatewords:18 }}</p>
+    <a href="{{ r.link }}" target="_blank" rel="noopener">🔗 Open link</a>
+  </div>
+  {% empty %}
+  <p class="empty-state">No resources found. <a href="{% url 'resources:resource_create' %}">Add your first resource</a>.</p>
+  {% endfor %}
+</div>
+
+<div class="pagination">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm">Prev</a>{% endif %}
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm">Next</a>{% endif %}
+</div>
+{% endblock %}

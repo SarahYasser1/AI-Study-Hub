@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ resource.title }}{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;">
+  <h2>{{ resource.title }}</h2>
+  <div>
+    <a href="{% url 'resources:resource_update' resource.pk %}" class="btn btn-sm">Edit</a>
+    <a href="{% url 'resources:resource_delete' resource.pk %}" class="btn btn-sm btn-danger">Delete</a>
+  </div>
+</div>
+<div class="card">
+  {% if resource.thumbnail %}<img src="{{ resource.thumbnail.url }}" style="max-width:100%;border-radius:8px;margin-bottom:1rem;">{% endif %}
+  <p>{{ resource.description }}</p>
+  <p><a href="{{ resource.link }}" target="_blank" rel="noopener">🔗 {{ resource.link }}</a></p>
+  {% if resource.resource_type %}<span class="badge badge-medium">{{ resource.resource_type.name }}</span>{% endif %}
+</div>
+{% endblock %}

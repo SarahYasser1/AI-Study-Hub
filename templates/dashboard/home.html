@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — AI Study Hub{% endblock %}
+{% block content %}
+<h2>Welcome back, {{ user.first_name|default:user.username }} 👋</h2>
+
+<div class="grid grid-4" style="margin:1.2rem 0;">
+  <div class="card stat-card">
+    <div class="value">{{ total_tasks }}</div>
+    <div class="label">Total Tasks</div>
+  </div>
+  <div class="card stat-card">
+    <div class="value">{{ total_notes }}</div>
+    <div class="label">Total Notes</div>
+  </div>
+  <div class="card stat-card">
+    <div class="value">{{ total_resources }}</div>
+    <div class="label">Total Resources</div>
+  </div>
+  <div class="card stat-card">
+    <div class="value">{{ completed_tasks }}/{{ total_tasks }}</div>
+    <div class="label">Tasks Completed</div>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h3>Task Priority Breakdown</h3>
+    <canvas id="priorityChart" height="180"></canvas>
+  </div>
+  <div class="card">
+    <h3>Upcoming Tasks</h3>
+    {% if upcoming_tasks %}
+    <table>
+      {% for task in upcoming_tasks %}
+      <tr>
+        <td>{{ task.title }}</td>
+        <td>{{ task.due_date|default:"No date" }}</td>
+        <td><span class="badge badge-{{ task.priority }}">{{ task.get_priority_display }}</span></td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty-state">No upcoming tasks. 🎉</p>
+    {% endif %}
+    <a href="{% url 'dashboard:export_tasks_pdf' %}" class="btn btn-sm" style="margin-top:.8rem;">📄 Export tasks as PDF</a>
+  </div>
+</div>
+
+<div class="grid grid-2" style="margin-top:1rem;">
+  <div class="card">
+    <h3>Recent Notes</h3>
+    {% for note in recent_notes %}
+    <p><a href="{{ note.get_absolute_url }}">{{ note.title }}</a> <small style="color:var(--muted);">{{ note.updated_at|date:"M d" }}</small></p>
+    {% empty %}
+    <p class="empty-state">No notes yet.</p>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <h3>Recent Activity</h3>
+    {% for activity in activities %}
+    <p>{{ activity.description }} <small style="color:var(--muted);">— {{ activity.created_at|timesince }} ago</small></p>
+    {% empty %}
+    <p class="empty-state">No activity yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+new Chart(document.getElementById('priorityChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['High', 'Medium', 'Low'],
+    datasets: [{
+      data: [{{ priority_high }}, {{ priority_medium }}, {{ priority_low }}],
+      backgroundColor: ['#ef4444', '#f59e0b', '#22c55e'],
+    }]
+  },
+  options: { responsive: true }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Tasks{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;">
+  <h2>My Tasks</h2>
+  <a href="{% url 'planner:task_create' %}" class="btn btn-primary">+ New Task</a>
+</div>
+
+<form method="get" class="filters">
+  <input type="text" name="q" value="{{ query }}" placeholder="Search tasks..." class="search-input" style="max-width:220px;">
+  <select name="status" onchange="this.form.submit()">
+    <option value="" {% if not status %}selected{% endif %}>All statuses</option>
+    <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+    <option value="completed" {% if status == 'completed' %}selected{% endif %}>Completed</option>
+  </select>
+  <select name="priority" onchange="this.form.submit()">
+    <option value="" {% if not priority %}selected{% endif %}>All priorities</option>
+    <option value="high" {% if priority == 'high' %}selected{% endif %}>High</option>
+    <option value="medium" {% if priority == 'medium' %}selected{% endif %}>Medium</option>
+    <option value="low" {% if priority == 'low' %}selected{% endif %}>Low</option>
+  </select>
+  <button type="submit" class="btn btn-sm">Filter</button>
+</form>
+
+<div class="card">
+  {% if page_obj.object_list %}
+  <table>
+    {% for task in page_obj %}
+    <tr class="task-row {% if task.is_completed %}completed{% endif %}">
+      <td>
+        <input type="checkbox" class="task-toggle" data-url="{% url 'planner:task_toggle_complete' task.pk %}" {% if task.is_completed %}checked{% endif %}>
+      </td>
+      <td style="{% if task.is_completed %}text-decoration:line-through;color:var(--muted);{% endif %}">{{ task.title }}</td>
+      <td>{{ task.due_date|default:"—" }}{% if task.is_overdue %} <span class="badge badge-high">Overdue</span>{% endif %}</td>
+      <td><span class="badge badge-{{ task.priority }}">{{ task.get_priority_display }}</span></td>
+      <td>
+        <a href="{% url 'planner:task_update' task.pk %}" class="btn btn-sm">Edit</a>
+        <a href="{% url 'planner:task_delete' task.pk %}" class="btn btn-sm btn-danger">Delete</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty-state">No tasks found. <a href="{% url 'planner:task_create' %}">Create your first task</a>.</p>
+  {% endif %}
+</div>
+
+<div class="pagination">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&q={{ query }}&status={{ status }}&priority={{ priority }}" class="btn btn-sm">Prev</a>{% endif %}
+  {% if page_obj.paginator.num_pages > 1 %}<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% endif %}
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&q={{ query }}&status={{ status }}&priority={{ priority }}" class="btn btn-sm">Next</a>{% endif %}
+</div>
+{% endblock %}

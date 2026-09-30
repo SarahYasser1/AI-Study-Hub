@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="{% if dark_mode %}dark{% else %}light{% endif %}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AI Study Hub{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  {% if user.is_authenticated %}
+  <nav class="navbar">
+    <a class="navbar-brand" href="{% url 'dashboard:home' %}">AI Study<span>Hub</span></a>
+
+    <div class="search-wrap">
+      <input type="text" id="global-search" class="search-input" placeholder="Search notes, tasks, resources...">
+      <div id="search-results" class="search-results"></div>
+    </div>
+
+    <div class="nav-links">
+      <a href="{% url 'dashboard:home' %}">Dashboard</a>
+      <a href="{% url 'planner:task_list' %}">Tasks</a>
+      <a href="{% url 'notes:note_list' %}">Notes</a>
+      <a href="{% url 'resources:resource_list' %}">Resources</a>
+      <a href="{% url 'ai_assistant:conversation_list' %}">AI Assistant</a>
+      <a href="{% url 'accounts:profile' %}">{{ user.username }}</a>
+      <a href="{% url 'accounts:logout' %}">Logout</a>
+      <button id="theme-toggle" class="toggle-btn">{% if dark_mode %}☀️ Light{% else %}🌙 Dark{% endif %}</button>
+    </div>
+  </nav>
+  {% endif %}
+
+  <div class="container">
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

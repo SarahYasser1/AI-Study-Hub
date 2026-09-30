@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}AI Assistant{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;">
+  <h2>AI Assistant</h2>
+  <a href="{% url 'ai_assistant:conversation_new' %}" class="btn btn-primary">+ New Chat</a>
+</div>
+<div class="card">
+  {% for c in conversations %}
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border);">
+    <a href="{% url 'ai_assistant:conversation_detail' c.pk %}">{{ c.title }}</a>
+    <small style="color:var(--muted);">{{ c.updated_at|timesince }} ago</small>
+  </div>
+  {% empty %}
+  <p class="empty-state">No conversations yet. <a href="{% url 'ai_assistant:conversation_new' %}">Start chatting</a> with your AI study assistant.</p>
+  {% endfor %}
+</div>
+{% endblock %}

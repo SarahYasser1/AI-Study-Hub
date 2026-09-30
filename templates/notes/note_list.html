@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Notes{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;">
+  <h2>My Notes</h2>
+  <div>
+    <a href="{% url 'notes:category_list' %}" class="btn btn-sm">Categories</a>
+    <a href="{% url 'notes:note_create' %}" class="btn btn-primary">+ New Note</a>
+  </div>
+</div>
+
+<form method="get" class="filters">
+  <input type="text" name="q" value="{{ query }}" placeholder="Search notes..." class="search-input" style="max-width:220px;">
+  <select name="category" onchange="this.form.submit()">
+    <option value="">All categories</option>
+    {% for c in categories %}
+    <option value="{{ c.id }}" {% if selected_category == c.id|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-sm">Filter</button>
+</form>
+
+<div class="grid grid-2">
+  {% for note in page_obj %}
+  <div class="card">
+    <h3><a href="{{ note.get_absolute_url }}">{{ note.title }}</a></h3>
+    <p>{{ note.content|truncatewords:20 }}</p>
+    <div>
+      {% for c in note.categories.all %}<span class="badge" style="background:{{ c.color }};color:#fff;">{{ c.name }}</span>{% endfor %}
+    </div>
+    <small style="color:var(--muted);">Updated {{ note.updated_at|timesince }} ago</small>
+  </div>
+  {% empty %}
+  <p class="empty-state">No notes found. <a href="{% url 'notes:note_create' %}">Create your first note</a>.</p>
+  {% endfor %}
+</div>
+
+<div class="pagination">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm">Prev</a>{% endif %}
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm">Next</a>{% endif %}
+</div>
+{% endblock %}

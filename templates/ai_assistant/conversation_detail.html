@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}{{ conversation.title }}{% endblock %}
+{% block content %}
+<h2>AI Study Assistant</h2>
+<div class="chat-window">
+  <div class="chat-sidebar">
+    <a href="{% url 'ai_assistant:conversation_new' %}">+ New chat</a>
+    {% for c in conversations %}
+    <a href="{% url 'ai_assistant:conversation_detail' c.pk %}" class="{% if c.pk == conversation.pk %}active{% endif %}">{{ c.title }}</a>
+    {% endfor %}
+  </div>
+  <div class="chat-main">
+    <div class="chat-messages" id="chat-messages">
+      {% for m in chat_messages %}
+      <div class="chat-bubble {{ m.role }}">{{ m.content }}</div>
+      {% empty %}
+      <p class="empty-state">Ask me anything about your studies — I can explain concepts, help you plan, or answer questions.</p>
+      {% endfor %}
+    </div>
+    <form class="chat-input-row" id="chat-form">
+      {% csrf_token %}
+      <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off" required>
+      <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const form = document.getElementById('chat-form');
+const input = document.getElementById('chat-input');
+const messagesDiv = document.getElementById('chat-messages');
+const sendUrl = "{% url 'ai_assistant:send_message' conversation.pk %}";
+
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  const content = input.value.trim();
+  if (!content) return;
+
+  appendBubble('user', content);
+  input.value = '';
+  input.disabled = true;
+
+  const thinking = document.createElement('div');
+  thinking.className = 'chat-bubble assistant';
+  thinking.textContent = 'Thinking...';
+  messagesDiv.appendChild(thinking);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  fetch(sendUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRFToken': getCookie('csrftoken'),
+    },
+    body: `content=${encodeURIComponent(content)}`,
+  })
+    .then(r => r.json())
+    .then(data => {
+      thinking.remove();
+      appendBubble('assistant', data.reply);
+      input.disabled = false;
+      input.focus();
+    });
+});
+
+function appendBubble(role, text) {
+  const div = document.createElement('div');
+  div.className = `chat-bubble ${role}`;
+  div.textContent = text;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+</script>
+{% endblock %}
